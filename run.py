@@ -9,16 +9,71 @@ NOTE: I already don't know how to recognize errors when trying to execute the co
 import argparse
 import sys
 import os
+from os import path
 
 
 __author__ = 'Anaxímeno Brito'
 __copyright__ = 'Copyright (c) 2021 by ' + __author__
-__version__ = '0.1-pre-alpha'
+__version__ = '0.2-pre-alpha'
 __license__ = 'undefined already'
 
 
-# NOTE: The code already made do not correspond to the real implementation of the program wanted,
-# so it is just a test of the ideas.
+def print_error(*errors, to_exit: bool = False):
+    full_error_msg = ' '.join(errors)
+    print(f'run: error: {full_error_msg}')
+    if to_exit:
+        exit(1)
+
+
+class File:
+
+    def __init__(self, filename: str):
+        self._exists = path.exists(filename)
+        # FIX: not working well with words that don't have any extensions,
+        # or unrecognized extensions.
+        self._name, self._extension = path.splitext(filename)
+
+    def __str__(self):
+        return self.get_name(self.get_extension())
+
+    def get_name(self, ext: str = '') -> str:
+        return str(self._name) + str(ext)
+
+    def get_extension(self) -> str:
+        return str(self._extension)
+
+    def get_fullname(self) -> str:
+        return self.get_name(self.get_extension())
+
+    def existence(self) -> bool:
+        return self._exists
+
+
+class Runner(object):
+
+    def __init__(self, args):
+        self.args = args
+        self.file = File(args.filename[0])
+        if self.file.existence() is False:
+            print_error(f'{self.file.get_fullname()!r} was not found!', to_exit=True)
+
+    def execute(self):
+        if self.args.python:
+            os.system(f'/usr/bin/python3 {self.file.get_fullname()}')
+        elif self.args.clang:
+            output = self.file.get_name(ext='.tmp.out')
+            os.system(f'gcc {self.file.get_fullname()} -o {output}')
+            if path.exists(output):
+                os.system(f'./{output}')
+                # NOTE: Below should be an argparse arguments to keep or eliminate compiled files.
+                if True:
+                    os.system(f'rm {output}')
+        elif self.args.cplusplus:
+            print("This part isn't finished!")
+        else:
+            print_error('The programming language was not chosen!', to_exit=True)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         prog='run',
@@ -31,68 +86,11 @@ if __name__ == '__main__':
         version='%(prog)s {}'.format(__version__)
     )
 
+    parser.add_argument('filename', nargs=1, help='name of the file.')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-c', '--clang', action='store_true')
+    group.add_argument('-py', '--python', action='store_true')
+    group.add_argument('-cpp', '--cplusplus', action='store_true')
 
-    '''
-    subparser = parser.add_subparsers(dest='subparser', title='Sub Command')
-    python = subparser.add_parser(
-        'py', 
-        help='run a python file',
-        description='run a python file',
-        usage='run py [filename] {--args arguments}'
-    )
-    python.add_argument('filename', help='name of the file')
-    python.add_argument('-a', '--args',
-        help='Arguments to the execution',
-        nargs='+'
-    )
-
-
-    clang = subparser.add_parser(
-        'c',
-        help='run a c file',
-        description='run a c file',
-        usage='run c [filename] {--args arguments}'
-    )
-    clang.add_argument('filename', help='name of the file')
-    clang.add_argument('-a', '--args', help='Arguments to the execution', nargs='+')
-
-
-    if len(sys.argv) > 1:
-        args = parser.parse_args()
-        subarg = args.subparser
-        if subarg == 'py':
-            if type(args.args) == list:
-                arguments = ' '.join(args.args)
-            else: arguments = args.args
-            os.system(f'/usr/bin/python3 {args.filename} {arguments}')
-        elif subarg == 'c':
-            name, ext = os.path.splitext(args.filename)
-            os.system(f'gcc {name+ext} -o {name}')
-            if os.path.exists(name):
-                if type(args.args) == list:
-                    arguments = ' '.join(args.args)
-                else: arguments = args.args
-                os.system(f'./{name} {args.args} && rm {name}')
-    else:
-        print("No args were given!")
-    '''
-
-    parser.add_argument('-c', '--clang', nargs=1, metavar='filename')
-    parser.add_argument('-py', '--python', nargs=1, metavar='filename')
-
-    a = parser.parse_args()
-
-    if a.python:
-        if os.path.exists(a.python[0]):
-            os.system(f'/usr/bin/python3 {a.python[0]}')
-        else:
-            print(f'{a.python[0]!r} was not found!')
-    elif a.clang:
-        if os.path.exists(a.clang[0]):
-            name, ext = os.path.splitext(a.clang[0])
-            tmp = 'xtmp000'
-            os.system(f'gcc {name+ext} -o {tmp}')
-            if os.path.exists(tmp):
-                os.system(f'./{tmp} && rm {tmp}')
-        else:
-            print(f'{a.clang[0]!r} was not found!')
+    runner = Runner(parser.parse_args())
+    runner.execute()
