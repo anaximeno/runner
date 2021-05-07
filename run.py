@@ -29,8 +29,11 @@ class File:
 
     def __init__(self, filename: str):
         self._exists = path.exists(filename)
-        self._name, self._extension = path.splitext(filename) \
-                if '.' in filename else filename, ''
+        if '.' in filename:
+            self._name, self._extension = path.splitext(filename)
+        else:
+            self._name, self._extension = filename, ''
+                
 
     def __str__(self):
         return self.get_name(self.get_extension())
