@@ -29,9 +29,8 @@ class File:
 
     def __init__(self, filename: str):
         self._exists = path.exists(filename)
-        # FIX: not working well with words that don't have any extensions,
-        # or unrecognized extensions.
-        self._name, self._extension = path.splitext(filename)
+        self._name, self._extension = path.splitext(filename) \
+                if '.' in filename else filename, ''
 
     def __str__(self):
         return self.get_name(self.get_extension())
