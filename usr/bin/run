@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Path were the python script should be placed.
+RUNNER=/usr/lib/runner/run.py
+
+if [ -e $RUNNER ] 
+then
+	$RUNNER $@
+else
+	echo 'run: error: Fatal file was not found, please try to reinstall the program!'
+fi
