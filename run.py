@@ -11,19 +11,13 @@ import argparse
 import sys
 import os
 from os import path
+from common import print_error
 
 
 __author__ = 'Anaxímeno Brito'
 __copyright__ = 'Copyright (c) 2021 by ' + __author__
 __version__ = '0.3-pre-alpha'
 __license__ = 'undefined already'
-
-
-def print_error(*errors, to_exit: bool = False):
-    full_error_msg = ' '.join(errors)
-    print(f'run: error: {full_error_msg}')
-    if to_exit:
-        exit(1)
 
 
 class File(object):
@@ -82,14 +76,14 @@ class Runner(object):
             print_error('The programming language was not chosen!', to_exit=True)
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(
         prog='run',
         usage='%(prog)s [-h/--help] [--version] {sub-command}',
         epilog='R-U-N %s' % __copyright__
     )
     parser.add_argument(
-        '--version', action='version',
+        '-v', '--version', action='version',
         help='show the current version of this program and exits.',
         version='%(prog)s {}'.format(__version__)
     )
@@ -102,11 +96,19 @@ if __name__ == '__main__':
     group.add_argument('-py', '--python', action='store_true')
     #group.add_argument('-cpp', '--cplusplus', action='store_true')
 
-    parser.add_argument('-a', '--args', help='arguments to the execution', nargs='+')
+    parser.add_argument('-a', '--args', help='arguments for the execution', nargs='+')
     parser.add_argument('--keep-compiled', 
-        help='keep compiled file on compiled languages',
+        help='don\'t delete compiled file on compiled languages',
         action='store_true'
     )
 
     runner = Runner(parser.parse_args())
     runner.execute()
+
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        main()
+    else:
+        print_error('No commands were given!')
+        print('usage: run {-c/-py/-cpp} {filename} {...} [--h/--help] [-v/--version]')
