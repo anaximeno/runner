@@ -5,7 +5,7 @@ import sys
 # Support module for the program
 __author__ = 'Anaxímeno Brito'
 __copyright__ = 'Copyright (c) 2021 by ' + __author__
-__version__ = '0.4-pre-alpha'
+__version__ = '0.5-pre-alpha'
 __license__ = 'undefined already'
 
 
@@ -66,17 +66,17 @@ class Procedure(object):
             print_error(f'{self._file.get_fullname()!r} was not found!', to_exit=True)
 
         self.supported_langs = {
-            '.c': self.clang,
-            '.py': self.python,
-            '.cpp': self.cplusplus
+            '.c': (self.clang, 'gcc'),
+            '.py': (self.python, ''),
+            '.cpp': (self.cplusplus, 'g++')
         }
 
     # NOTE: Why this name? :)
     def predict_lang(self):
-        """Tries to determine to programming language of the file."""
+        """Return the function and compiler of each programming language."""
         if self._file.get_extension() in self.supported_langs:
             return self.supported_langs[self._file.get_extension()]
-        return None
+        return (None, None)
 
     # TODO: add more languages and configurations
     def python(self, **kwargs):
@@ -85,10 +85,10 @@ class Procedure(object):
             f'/usr/bin/python3 {self._file.get_fullpath()} {self.command_args}'
         )
 
-    def clang(self, keep_compiled: bool = False, **kwargs):
+    def clang(self, keep_compiled: bool = False, compiler: str = 'gcc', **kwargs):
         """Run a C file."""
         output = '.' + self._file.get_name(ext='.tmp.out')
-        os.system(f'gcc {self._file.get_fullpath()} -o {output}')
+        os.system(f'{compiler} {self._file.get_fullpath()} -o {output}')
         if os.path.exists(output):
             os.system(f'./{output} {self.command_args}')
             if keep_compiled is True:
@@ -96,8 +96,14 @@ class Procedure(object):
             else:
                 os.system(f'rm {output}')
     
-    def cplusplus(self, keep_compiled: bool = False, **kwargs):
+    def cplusplus(self, keep_compiled: bool = False, compiler: str = 'g++', **kwargs):
         """Run a C++ file."""
-        # TODO: finish the cpp compiling process
-        print_error("Working with cpp isn't finished yet!", to_exit=True)
+        output = '.' + self._file.get_name(ext='.tmp.out')
+        os.system(f'{compiler} {self._file.get_fullpath()} -o {output}')
+        if os.path.exists(output):
+            os.system(f'./{output} {self.command_args}')
+            if keep_compiled is True:
+                os.system(f'mv {output} {self._file.get_name()}')
+            else:
+                os.system(f'rm {output}')
 

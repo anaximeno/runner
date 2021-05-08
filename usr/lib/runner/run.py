@@ -10,7 +10,7 @@ import os
 
 __author__ = 'Anaxímeno Brito'
 __copyright__ = 'Copyright (c) 2021 by ' + __author__
-__version__ = '0.4-pre-alpha'
+__version__ = '0.5-pre-alpha'
 __license__ = 'undefined already'
 
 
@@ -24,14 +24,17 @@ class Runner(Procedure):
         if self._args.python:
             self.python()
         elif self._args.clang:
-            self.clang(keep_compiled=self._args.keep_compiled)
+            self.clang(keep_compiled=self._args.keep_compiled,
+                compiler=self._args.compiler[0] if self._args.compiler else 'gcc')
         elif self._args.cplusplus:
-            self.cplusplus(keep_compiled=self._args.keep_compiled)
+            self.cplusplus(keep_compiled=self._args.keep_compiled,
+                compiler=self._args.compiler[0] if self._args.compiler else 'g++')
         else:
             # NOTE: This section is incomplete.
-            lang = self.predict_lang()
+            lang, compiler = self.predict_lang()
             if lang:
-                lang(keep_compiled=self._args.keep_compiled)
+                lang(keep_compiled=self._args.keep_compiled,
+                    compiler=self._args.compiler[0] if self._args.compiler else compiler)
             else:
                 cm.print_error('Programming language was not indicated, try to specify the language type!', to_exit=True)
 
@@ -62,6 +65,7 @@ def main():
         help='don\'t delete compiled file on compiled languages',
         action='store_true'
     )
+    parser.add_argument('--compiler', help='Determine the compiler to be used', nargs=1)
 
     run = Runner(parser.parse_args())
     run.execute()
