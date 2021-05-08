@@ -66,14 +66,13 @@ class Runner(object):
                 f'/usr/bin/python3 {self.file.get_fullname()} {self.command_args}'
             )
         elif self.args.clang:
-            output = self.file.get_name(
-                ext='.tmp.out' if self.args.keep_compiled is not True else ''
-            )
+            output = '.' + self.file.get_name(ext='.tmp.out')
             os.system(f'gcc {self.file.get_fullname()} -o {output}')
             if path.exists(output):
                 os.system(f'./{output} {self.command_args}')
-                # NOTE: Below should be an argparse arguments to keep or eliminate compiled files.
-                if self.args.keep_compiled is not True:
+                if self.args.keep_compiled is True:
+                    os.system(f'mv {output} {self.file.get_name()}')
+                else:
                     os.system(f'rm {output}')
         # TODO: finish the cpp compiling process
         #elif self.args.cplusplus:
