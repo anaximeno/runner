@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-import sys
+
 
 # Support module for the program
 __author__ = 'Anaxímeno Brito'
@@ -9,7 +9,7 @@ __version__ = '0.5-pre-alpha'
 __license__ = 'undefined already'
 
 
-def print_error(*errors, to_exit: bool = False):
+def print_error(*errors: str, to_exit: bool = False):
     """Show the error message and exits if `to_exit` is set to True."""
     full_error_msg = ' '.join(errors)
     print(f'run: error: {full_error_msg}')
@@ -27,28 +27,28 @@ class File(object):
         else:
             self._name, self._extension = self._fname, ''           
 
-    def __str__(self)-> str:
+    def __str__(self) -> str:
         return self.get_fullpath()
 
     def get_name(self, ext: str = '') -> str:
-        """Returs the name of the file if no `ext` (extension) was entered else 
-        returns the name with the extension."""
+        """Return only the name of the file if no `ext` (extension) was entered else 
+        return the name with the extension."""
         return str(self._name) + str(ext)
 
     def get_extension(self) -> str:
-        """Returns the file extension."""
+        """Return the file extension."""
         return str(self._extension)
 
     def get_dir(self) -> str:
-        """Returns the file directory."""
+        """Return the file directory."""
         return str(self._dir)
 
     def get_fullname(self) -> str:
-        """Returns the name of the file with it's extension."""
+        """Return the name of the file with it's extension."""
         return self.get_name(self.get_extension())
 
     def get_fullpath(self)-> str:
-        '''Returns the full path of the file.'''
+        """Return the full path of the file."""
         return os.path.join(self.get_dir(), self.get_fullname())
 
     def existence(self) -> bool:
@@ -58,9 +58,9 @@ class File(object):
 
 class Procedure(object):
 
-    def __init__(self, file: File, command_args: list = ['']):
+    def __init__(self, file: File, command_args: list = ['command args']):
         self._file = file
-        self.command_args = ' '.join(command_args)
+        self._command_args = ' '.join(command_args)
         
         if self._file.existence() is False:
             print_error(f'{self._file.get_fullname()!r} was not found!', to_exit=True)
@@ -82,7 +82,7 @@ class Procedure(object):
     def python(self, **kwargs):
         """Run a python file."""
         os.system(
-            f'/usr/bin/python3 {self._file.get_fullpath()} {self.command_args}'
+            f'/usr/bin/python3 {self._file.get_fullpath()} {self._command_args}'
         )
 
     def clang(self, keep_compiled: bool = False, compiler: str = 'gcc', **kwargs):
@@ -90,7 +90,7 @@ class Procedure(object):
         output = '.' + self._file.get_name(ext='.tmp.out')
         os.system(f'{compiler} {self._file.get_fullpath()} -o {output}')
         if os.path.exists(output):
-            os.system(f'./{output} {self.command_args}')
+            os.system(f'./{output} {self._command_args}')
             if keep_compiled is True:
                 os.system(f'mv {output} {self._file.get_name()}')
             else:
@@ -98,12 +98,5 @@ class Procedure(object):
     
     def cplusplus(self, keep_compiled: bool = False, compiler: str = 'g++', **kwargs):
         """Run a C++ file."""
-        output = '.' + self._file.get_name(ext='.tmp.out')
-        os.system(f'{compiler} {self._file.get_fullpath()} -o {output}')
-        if os.path.exists(output):
-            os.system(f'./{output} {self.command_args}')
-            if keep_compiled is True:
-                os.system(f'mv {output} {self._file.get_name()}')
-            else:
-                os.system(f'rm {output}')
+        self.clang(keep_compiled=keep_compiled, compiler=compiler)
 
