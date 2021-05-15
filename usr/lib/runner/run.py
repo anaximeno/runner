@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-"""docstring
-"""
-import common as cm
-from common import File, Procedure
+"""docstring"""
+from common import File, Procedure, print_error
 import argparse
 import sys
-import os
 
 
 __author__ = 'Anaxímeno Brito'
@@ -36,7 +33,7 @@ class Runner(Procedure):
                 lang(keep_compiled=self._args.keep_compiled,
                     compiler=self._args.compiler[0] if self._args.compiler else compiler)
             else:
-                cm.print_error('Programming language was not indicated, try to specify the language type!', to_exit=True)
+                print_error('Programming language was not indicated, try to specify the language type!', to_exit=True)
 
 
 def main():
@@ -51,15 +48,15 @@ def main():
         help='show the current version of this program and exits.',
         version='%(prog)s {}'.format(__version__)
     )
-
     parser.add_argument('filename', nargs=1, help='name of the file.')
 
-    # Exclusive arguments
+    ### Exclusive arguments
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-c', '--clang', action='store_true')
     group.add_argument('-py', '--python', action='store_true')
     group.add_argument('-cpp', '--cplusplus', action='store_true')
 
+    ### Other arguments
     parser.add_argument('-a', '--args', help='arguments for the execution', nargs='+')
     parser.add_argument('--keep-compiled', 
         help='don\'t delete compiled file on compiled languages',
@@ -75,9 +72,8 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         main()
     else:
-        cm.print_error('No commands were given!')
-        print('usage: run {-c/-py/-cpp} {filename} {...} [--h/--help] [-v/--version]')
-
+        print_error('No commands were given!')
+        print('usage: run {-c/-py/-cpp} {filename} {...} [-h/--help] [-v/--version]')
 
 
 # TODO: I want to make  program that compiles and executes different types of programming languages.
