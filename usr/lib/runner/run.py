@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""docstring"""
 from common import File, Procedure, print_error
 import argparse
 import sys
