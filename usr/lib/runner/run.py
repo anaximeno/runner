@@ -35,7 +35,7 @@ class Runner(Procedure):
                 print_error('Programming language was not indicated, try to specify the language type!', to_exit=True)
 
 
-def main():
+def main(*args, **kwargs):
     """Runs the program."""
     parser = argparse.ArgumentParser(
         prog='run',
