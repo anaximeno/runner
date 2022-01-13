@@ -6,7 +6,7 @@ import sys
 
 __author__ = 'Anaxímeno Brito'
 __copyright__ = 'Copyright (c) 2021 by ' + __author__
-__version__ = '0.5-pre-alpha'
+__version__ = '0.6.0a'
 __license__ = 'undefined already'
 
 
@@ -32,7 +32,7 @@ class Runner(Procedure):
                 lang(keep_compiled=self._args.keep_compiled,
                     compiler=self._args.compiler[0] if self._args.compiler else compiler)
             else:
-                print_error('Programming language was not indicated, try to specify the language type!', to_exit=True)
+                print_error('Programming language was not recognized, try to specify the language type!', to_exit=True)
 
 
 def main(*args, **kwargs):
@@ -54,6 +54,7 @@ def main(*args, **kwargs):
     group.add_argument('-c', '--clang', action='store_true')
     group.add_argument('-py', '--python', action='store_true')
     group.add_argument('-cpp', '--cplusplus', action='store_true')
+    group.add_argument('-rs', '--rust', action='store_true')
 
     ### Other arguments
     parser.add_argument('-a', '--args', help='arguments for the execution', nargs='+')

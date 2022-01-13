@@ -68,7 +68,8 @@ class Procedure(object):
         self.supported_langs = {
             '.c': (self.clang, 'gcc'),
             '.py': (self.python, ''),
-            '.cpp': (self.cplusplus, 'g++')
+            '.cpp': (self.cplusplus, 'g++'),
+            '.rs': (self.rust, 'rustc')
         }
 
     # NOTE: Why this name? :)
@@ -87,6 +88,7 @@ class Procedure(object):
 
     def clang(self, keep_compiled: bool = False, compiler: str = 'gcc', **kwargs):
         """Run a C file."""
+        # TODO: FIXME: abstract the compiling process
         output = '.' + self._file.get_name(ext='.tmp.out')
         os.system(f'{compiler} {self._file.get_fullpath()} -o {output}')
         if os.path.exists(output):
@@ -100,3 +102,5 @@ class Procedure(object):
         """Run a C++ file."""
         self.clang(keep_compiled=keep_compiled, compiler=compiler)
 
+    def rust(self, keep_compiled: bool = False, compiler: str = 'rustc', **kwargs):
+        self.clang(keep_compiled=keep_compiled, compiler=compiler)
